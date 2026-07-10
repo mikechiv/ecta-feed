@@ -1,0 +1,26 @@
+name: Update Econometrica feed
+
+on:
+  schedule:
+    - cron: "0 */6 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build feed
+        run: python3 build_feed.py
+
+      - name: Commit updated feed
+        run: |
+          git config user.name "feed-bot"
+          git config user.email "actions@github.com"
+          git add feed.xml seen.json
+          git diff --cached --quiet || git commit -m "Update feed $(date -u +%F)"
+          git push
